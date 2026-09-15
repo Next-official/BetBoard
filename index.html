@@ -1,0 +1,711 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>BetBoard</title>
+<link rel="manifest" href="manifest.json">
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Tahoma, sans-serif;
+    font-size: 13px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #008080;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+}
+
+/* Finestra principale a tutto schermo su Mobile */
+.win95-window {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    background: #c0c0c0;
+    display: flex;
+    flex-direction: column;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #000000;
+    border-bottom: 2px solid #000000;
+}
+
+.title-bar {
+    background: linear-gradient(90deg, #000080, #1084d0);
+    color: white;
+    padding: 6px 10px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.win-btn {
+    background: #c0c0c0;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #000000;
+    border-bottom: 2px solid #000000;
+    padding: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #000;
+    text-align: center;
+    user-select: none;
+}
+
+.win-btn:active {
+    border-top: 2px solid #000000;
+    border-left: 2px solid #000000;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+}
+
+.tabs-header {
+    display: flex;
+    gap: 2px;
+    padding: 4px 4px 0 4px;
+    background: #c0c0c0;
+    flex-shrink: 0;
+}
+
+.tab-link {
+    flex: 1;
+    background: #c0c0c0;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #000000;
+    border-bottom: none;
+    padding: 10px 2px;
+    text-align: center;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.tab-link.active {
+    background: #c0c0c0;
+    margin-bottom: -2px;
+    z-index: 2;
+    padding-bottom: 12px;
+}
+
+/* Corpo della Finestra scorrevole */
+.window-body {
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #000000;
+    border-bottom: 2px solid #000000;
+    padding: 8px;
+    background: #c0c0c0;
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.inset-box {
+    border-top: 2px solid #808080;
+    border-left: 2px solid #808080;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+    padding: 8px;
+    margin-bottom: 8px;
+    background: #c0c0c0;
+}
+
+.inset-title {
+    font-weight: bold;
+    margin-bottom: 6px;
+    color: #000080;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+input[type="text"], input[type="password"], select, textarea {
+    border-top: 2px solid #808080;
+    border-left: 2px solid #808080;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+    padding: 10px;
+    background: #fff;
+    outline: none;
+    color: #000;
+    font-size: 14px;
+    width: 100%;
+    border-radius: 0;
+    -webkit-appearance: none;
+}
+
+.bet-card {
+    background: #fff;
+    border-top: 2px solid #808080;
+    border-left: 2px solid #808080;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+    padding: 8px;
+    margin-bottom: 8px;
+}
+
+.bet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    color: #000080;
+    margin-bottom: 6px;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 4px;
+}
+
+.bet-body {
+    font-size: 13px;
+    line-height: 1.4;
+    color: #111;
+    margin-bottom: 6px;
+    word-break: break-word;
+}
+
+.badge-status {
+    font-size: 10px;
+    padding: 2px 4px;
+    font-weight: bold;
+}
+
+.badge-open { background: #000080; color: #fff; }
+.badge-closed { background: #008000; color: #fff; }
+.btn-danger { background: #c0c0c0; color: #a00000; }
+
+.status-bar {
+    border-top: 2px solid #808080;
+    border-left: 2px solid #808080;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+    padding: 4px 6px;
+    background: #c0c0c0;
+    font-size: 11px;
+    color: #444;
+    flex-shrink: 0;
+}
+
+.hidden { display: none !important; }
+
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    padding: 8px;
+}
+
+.admin-nav {
+    display: flex;
+    gap: 3px;
+    margin-bottom: 8px;
+}
+</style>
+</head>
+<body>
+
+<div class="win95-window">
+    <div class="title-bar">
+        <span>BetBoard</span>
+        <button class="win-btn" style="padding:4px 8px;" onclick="openAdminModal()">Editor</button>
+    </div>
+
+    <div class="tabs-header">
+        <button class="tab-link active" id="tabProfileBtn" onclick="switchTab('profile')">Profilo</button>
+        <button class="tab-link" id="tabBetsBtn" onclick="switchTab('bets')">Scommesse</button>
+        <button class="tab-link" id="tabRankingBtn" onclick="switchTab('ranking')">Classifica</button>
+        <button class="tab-link" id="tabRulesBtn" onclick="switchTab('rules')">Regole</button>
+    </div>
+
+    <div class="window-body">
+        <!-- PROFILO -->
+        <div id="profileTab">
+            <div class="inset-box" id="authBox">
+                <div class="inset-title">Accedi o Registrati</div>
+                <div style="margin-bottom:8px;">
+                    <label style="display:block; margin-bottom:2px; font-weight:bold;">Nickname:</label>
+                    <input type="text" id="authUsername">
+                </div>
+                <div style="margin-bottom:10px;">
+                    <label style="display:block; margin-bottom:2px; font-weight:bold;">Password:</label>
+                    <input type="password" id="authPassword">
+                </div>
+                <div style="display:flex; gap:6px;">
+                    <button class="win-btn" style="flex:1; padding:10px;" onclick="loginUser()">Accedi</button>
+                    <button class="win-btn" style="flex:1; padding:10px;" onclick="registerUser()">Registrati</button>
+                </div>
+            </div>
+
+            <div class="inset-box hidden" id="profileBox">
+                <div class="inset-title">Scheda Utente</div>
+                <p style="margin-bottom:6px; font-size:14px;">Utente: <b id="userNameDisplay">-</b></p>
+                <p style="margin-bottom:12px; font-size:14px;">Punteggio: <b id="userPointsDisplay" style="color:#000080;">0 PT</b></p>
+                <button class="win-btn" style="width:100%; padding:10px;" onclick="logout()">Scollegati</button>
+            </div>
+        </div>
+
+        <!-- SCOMMESSE -->
+        <div id="betsTab" class="hidden">
+            <div class="inset-box">
+                <div class="inset-title">Invia Scommessa</div>
+                <div style="margin-bottom:8px;">
+                    <input type="text" id="newBetText" placeholder="Scrivi la tua scommessa...">
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <label style="font-weight:bold;">Punti Proposti:</label>
+                    <select id="newBetPts" style="width:auto; padding:6px 12px;">
+                        <option value="10">10 PT</option>
+                        <option value="20" selected>20 PT</option>
+                        <option value="50">50 PT</option>
+                        <option value="100">100 PT</option>
+                    </select>
+                </div>
+                <button class="win-btn" style="width:100%; padding:10px;" onclick="sendBet()">Invia Scommessa</button>
+            </div>
+
+            <div class="inset-box" style="flex:1;">
+                <div class="inset-title">Scommesse Inviate</div>
+                <div id="betsList"></div>
+            </div>
+        </div>
+
+        <!-- CLASSIFICA -->
+        <div id="rankingTab" class="hidden">
+            <div class="inset-box">
+                <div class="inset-title">Classifica Generale</div>
+                <div id="rankingList"></div>
+            </div>
+        </div>
+
+        <!-- REGOLE -->
+        <div id="rulesTab" class="hidden">
+            <div class="inset-box">
+                <div class="inset-title">Regolamento Ufficiale</div>
+                <div id="rulesContent" style="white-space: pre-wrap; font-size:13px; line-height:1.4; background:#fff; padding:10px; border-top:2px solid #808080; border-left:2px solid #808080;">Nessuna regola inserita.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="status-bar" id="statusBar">Sistema pronto.</div>
+</div>
+
+<!-- MODALE EDITOR -->
+<div id="adminModal" class="modal-overlay hidden">
+    <div class="win95-window" style="height:auto; max-height:90vh; width:100%; max-width:380px;">
+        <div class="title-bar">
+            <span>⚙ Pannello Editor</span>
+            <button class="win-btn" style="padding:2px 6px;" onclick="closeAdminModal()">X</button>
+        </div>
+        <div class="window-body">
+            <div id="adminLoginForm">
+                <div class="inset-title">Password Accesso Editor:</div>
+                <input type="password" id="adminPassInput" placeholder="Password..." style="margin-bottom:8px;">
+                <button class="win-btn" style="width:100%; padding:10px;" onclick="loginAdmin()">Entra come Editor</button>
+            </div>
+
+            <div id="adminControls" class="hidden">
+                <div class="admin-nav">
+                    <button class="win-btn" style="flex:1;" onclick="switchAdminTab('bets')">Scommesse</button>
+                    <button class="win-btn" style="flex:1;" onclick="switchAdminTab('users')">Profili</button>
+                    <button class="win-btn" style="flex:1;" onclick="switchAdminTab('rules')">Regole</button>
+                </div>
+
+                <div id="adminBetsSec">
+                    <div class="inset-title">Valida / Assegna Punti:</div>
+                    <div id="adminBetsList" style="max-height:220px; overflow-y:auto;"></div>
+                </div>
+
+                <div id="adminUsersSec" class="hidden">
+                    <div class="inset-title">Gestione Profili:</div>
+                    <div id="adminUsersList" style="max-height:220px; overflow-y:auto;"></div>
+                </div>
+
+                <div id="adminRulesSec" class="hidden">
+                    <div class="inset-title">Modifica Regolamento:</div>
+                    <textarea id="rulesTextarea" rows="6" style="margin-bottom:6px;"></textarea>
+                    <button class="win-btn" style="width:100%; padding:8px;" onclick="saveRules()">Salva Regole</button>
+                </div>
+
+                <button class="win-btn btn-danger" style="width:100%; margin-top:10px; padding:10px;" onclick="logoutAdmin()">Esci dall'Editor</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const CREATOR_PASS = "070814E";
+
+let users = [];
+let bets = [];
+let gameRules = `BENVENUTO SU BETBOARD!
+Il portale online per fare scommesse e divertirsi tra compagni!
+
+1. Lanciare una scommessa
+Per lanciare la tua scommessa personalizzata, dopo il login dalla sezione "Profilo", andare nella sezione "Scommesse" e compilare il campo in alto. 
+Assegna poi i punti che speri sia sensato vincere una volta validata la scommessa.
+Premi "Invia Scommessa" e assicurati che compaia subito sotto. Insieme alla tua scommessa troverai anche le scommesse dei tuoi compagni, CHE SARANNO VERIFICATE OGNI VENERDÌ DEL MESE, salvo controlli anticipati da parte dell'editor.
+
+2. Punti
+I punti, controllabili nella sezione "Classifica", sono assegnati dall'editor una volta controllate e verificate tutte le scommesse della settimana.
+Non sempre i punti assegnati per scommessa corrispondono a quelli puntati: l'editor ha il dovere di modificarli se ritenuti inopportuni.
+
+3. Account
+Dell'account personale ne è possibile la creazione dalla sezione "Profili". 
+Per far si che la creazione funzioni, inserire il proprio nome utente (sempre uguale ad ogni login) e la propria password (sempre uguale ad ogni login).
+Gli account possono essere eliminati dall'editor se luogo di comportamenti scorretti.
+
+4. Ban e controlli 
+L'editor ha il totale permesso di:
+- Eliminare o modificare profili
+- Eliminare o modificare scommesse
+- Modificare punti scommesse
+- Bannare profili
+- Impedire l'accesso futuro su BetBoard
+
+5. Info
+roncoroni.tobia@iccantu2.com`;
+
+let currentUser = null;
+let isAdmin = false;
+
+function init() {
+    loadData();
+    updateUI();
+}
+
+function setStatus(msg) {
+    document.getElementById('statusBar').textContent = msg;
+}
+
+function switchTab(tab) {
+    document.querySelectorAll('.tab-link').forEach(btn => btn.classList.remove('active'));
+    document.getElementById('tabProfileBtn').classList.toggle('active', tab === 'profile');
+    document.getElementById('tabBetsBtn').classList.toggle('active', tab === 'bets');
+    document.getElementById('tabRankingBtn').classList.toggle('active', tab === 'ranking');
+    document.getElementById('tabRulesBtn').classList.toggle('active', tab === 'rules');
+
+    document.getElementById('profileTab').classList.toggle('hidden', tab !== 'profile');
+    document.getElementById('betsTab').classList.toggle('hidden', tab !== 'bets');
+    document.getElementById('rankingTab').classList.toggle('hidden', tab !== 'ranking');
+    document.getElementById('rulesTab').classList.toggle('hidden', tab !== 'rules');
+
+    if (tab === 'bets') renderBets();
+    if (tab === 'ranking') renderRanking();
+    if (tab === 'rules') renderRules();
+}
+
+function registerUser() {
+    const user = document.getElementById('authUsername').value.trim();
+    const pass = document.getElementById('authPassword').value;
+
+    if (!user || !pass) return alert("Inserisci Nickname e Password!");
+
+    let found = users.find(u => u.name.toLowerCase() === user.toLowerCase());
+    if (found) return alert("Nickname già esistente!");
+
+    const newUser = { name: user, password: pass, points: 0 };
+    users.push(newUser);
+    currentUser = newUser;
+    saveData();
+    updateUI();
+    alert("Profilo creato!");
+}
+
+function loginUser() {
+    const user = document.getElementById('authUsername').value.trim();
+    const pass = document.getElementById('authPassword').value;
+
+    let found = users.find(u => u.name.toLowerCase() === user.toLowerCase() && u.password === pass);
+    if (!found) return alert("Credenziali errate!");
+
+    currentUser = found;
+    saveData();
+    updateUI();
+    setStatus("Connesso: " + currentUser.name);
+}
+
+function logout() {
+    currentUser = null;
+    saveData();
+    updateUI();
+    setStatus("Scollegato.");
+}
+
+function updateUI() {
+    if (currentUser) {
+        document.getElementById('authBox').classList.add('hidden');
+        document.getElementById('profileBox').classList.remove('hidden');
+        document.getElementById('userNameDisplay').textContent = currentUser.name;
+        document.getElementById('userPointsDisplay').textContent = currentUser.points + " PT";
+    } else {
+        document.getElementById('authBox').classList.remove('hidden');
+        document.getElementById('profileBox').classList.add('hidden');
+    }
+}
+
+function sendBet() {
+    if (!currentUser) return alert("Effettua prima l'accesso!");
+    const text = document.getElementById('newBetText').value.trim();
+    const pts = parseInt(document.getElementById('newBetPts').value);
+
+    if (!text) return alert("Inserisci il testo della scommessa!");
+
+    bets.unshift({
+        id: Date.now(),
+        author: currentUser.name,
+        text: text,
+        pts: pts,
+        status: "open",
+        awardedPts: 0
+    });
+
+    document.getElementById('newBetText').value = "";
+    saveData();
+    renderBets();
+    setStatus("Scommessa inviata!");
+    alert("Scommessa inviata all'Editor!");
+}
+
+function renderBets() {
+    const container = document.getElementById('betsList');
+    container.innerHTML = '';
+
+    if (bets.length === 0) {
+        container.innerHTML = '<p style="color:#555;">Nessuna scommessa presente.</p>';
+        return;
+    }
+
+    bets.forEach(b => {
+        const div = document.createElement('div');
+        div.className = 'bet-card';
+        
+        let badge = b.status === 'open' 
+            ? `<span class="badge-status badge-open">IN ATTESA</span>` 
+            : `<span class="badge-status badge-closed">+${b.awardedPts} PT</span>`;
+
+        div.innerHTML = `
+            <div class="bet-header">
+                <span>${b.author}</span>
+                ${badge}
+            </div>
+            <div class="bet-body">${b.text}</div>
+            <div style="font-size:11px; color:#555;">Punti Proposti: <b>${b.pts} PT</b></div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function renderRanking() {
+    const container = document.getElementById('rankingList');
+    container.innerHTML = '';
+
+    const sorted = [...users].sort((a,b) => b.points - a.points);
+    if (sorted.length === 0) {
+        container.innerHTML = '<p style="color:#555;">Nessun utente registrato.</p>';
+        return;
+    }
+
+    sorted.forEach((u, idx) => {
+        const item = document.createElement('div');
+        item.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px dotted #808080;";
+        item.innerHTML = `
+            <span style="font-size:14px;"><b>#${idx+1}</b> ${u.name}</span>
+            <span style="font-weight:bold; color:#000080; font-size:14px;">${u.points} PT</span>
+        `;
+        container.appendChild(item);
+    });
+}
+
+function renderRules() {
+    document.getElementById('rulesContent').textContent = gameRules;
+}
+
+function openAdminModal() {
+    document.getElementById('adminModal').classList.remove('hidden');
+}
+
+function closeAdminModal() {
+    document.getElementById('adminModal').classList.add('hidden');
+}
+
+function loginAdmin() {
+    if (document.getElementById('adminPassInput').value === CREATOR_PASS) {
+        isAdmin = true;
+        document.getElementById('adminLoginForm').classList.add('hidden');
+        document.getElementById('adminControls').classList.remove('hidden');
+        renderAdminBets();
+        renderAdminUsers();
+        document.getElementById('rulesTextarea').value = gameRules;
+    } else {
+        alert("Password Editor Errata!");
+    }
+}
+
+function logoutAdmin() {
+    isAdmin = false;
+    document.getElementById('adminPassInput').value = "";
+    document.getElementById('adminLoginForm').classList.remove('hidden');
+    document.getElementById('adminControls').classList.add('hidden');
+    closeAdminModal();
+    setStatus("Modalità Editor chiusa.");
+}
+
+function switchAdminTab(sec) {
+    document.getElementById('adminBetsSec').classList.toggle('hidden', sec !== 'bets');
+    document.getElementById('adminUsersSec').classList.toggle('hidden', sec !== 'rules' && sec !== 'users');
+    document.getElementById('adminUsersSec').classList.toggle('hidden', sec !== 'users');
+    document.getElementById('adminRulesSec').classList.toggle('hidden', sec !== 'rules');
+}
+
+function renderAdminBets() {
+    const container = document.getElementById('adminBetsList');
+    container.innerHTML = '';
+
+    if (bets.length === 0) {
+        container.innerHTML = '<p style="font-size:11px;">Nessuna scommessa.</p>';
+        return;
+    }
+
+    bets.forEach(b => {
+        const div = document.createElement('div');
+        div.style.cssText = "background:#fff; border:1px solid #808080; padding:6px; margin-bottom:6px;";
+        
+        let actions = b.status === 'open' ? `
+            <div style="display:flex; gap:4px; margin-top:6px;">
+                <button class="win-btn" style="flex:1; padding:6px;" onclick="awardPoints(${b.id})">Assegna Punti</button>
+                <button class="win-btn btn-danger" style="padding:6px;" onclick="deleteBet(${b.id})">Elimina</button>
+            </div>
+        ` : `<div style="color:green; font-weight:bold; margin-top:4px; font-size:11px;">Assegnati +${b.awardedPts} PT</div>`;
+
+        div.innerHTML = `
+            <div style="font-weight:bold; color:#000080;">${b.author} (${b.pts} PT)</div>
+            <div style="margin:2px 0;">${b.text}</div>
+            ${actions}
+        `;
+        container.appendChild(div);
+    });
+}
+
+function awardPoints(betId) {
+    const b = bets.find(x => x.id === betId);
+    if (!b) return;
+
+    const ptsStr = prompt(`Quanti punti vuoi assegnare a ${b.author}?`, b.pts);
+    if (ptsStr !== null && !isNaN(parseInt(ptsStr))) {
+        const pts = parseInt(ptsStr);
+        b.status = 'closed';
+        b.awardedPts = pts;
+
+        const u = users.find(x => x.name === b.author);
+        if (u) u.points += pts;
+
+        saveData();
+        renderAdminBets();
+        if (currentUser) updateUI();
+        alert(`Assegnati ${pts} PT a ${b.author}!`);
+    }
+}
+
+function deleteBet(betId) {
+    if (confirm("Cancellare la scommessa?")) {
+        bets = bets.filter(x => x.id !== betId);
+        saveData();
+        renderAdminBets();
+        renderBets();
+    }
+}
+
+function renderAdminUsers() {
+    const container = document.getElementById('adminUsersList');
+    container.innerHTML = '';
+
+    users.forEach(u => {
+        const div = document.createElement('div');
+        div.style.cssText = "background:#fff; border:1px solid #808080; padding:6px; margin-bottom:6px;";
+        div.innerHTML = `
+            <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:4px;">
+                <span>${u.name}</span>
+                <span>${u.points} PT</span>
+            </div>
+            <div style="display:flex; gap:4px;">
+                <button class="win-btn" style="flex:1; padding:6px;" onclick="editUserPoints('${u.name}')">Modifica Punti</button>
+                <button class="win-btn btn-danger" style="padding:6px;" onclick="deleteUser('${u.name}')">Banna</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function editUserPoints(username) {
+    const u = users.find(x => x.name === username);
+    if (!u) return;
+    const newPts = prompt(`Imposta punti per ${u.name}:`, u.points);
+    if (newPts !== null && !isNaN(parseInt(newPts))) {
+        u.points = parseInt(newPts);
+        saveData();
+        renderAdminUsers();
+        if (currentUser) updateUI();
+    }
+}
+
+function deleteUser(username) {
+    if (confirm(`Eliminare l'account ${username}?`)) {
+        users = users.filter(x => x.name !== username);
+        if (currentUser && currentUser.name === username) logout();
+        saveData();
+        renderAdminUsers();
+    }
+}
+
+function saveRules() {
+    gameRules = document.getElementById('rulesTextarea').value;
+    saveData();
+    renderRules();
+    alert("Regolamento salvato!");
+}
+
+function saveData() {
+    localStorage.setItem('sb95_users', JSON.stringify(users));
+    localStorage.setItem('sb95_bets', JSON.stringify(bets));
+    localStorage.setItem('sb95_rules', gameRules);
+    if (currentUser) localStorage.setItem('sb95_currentUser', currentUser.name);
+}
+
+function loadData() {
+    const u = localStorage.getItem('sb95_users');
+    const b = localStorage.getItem('sb95_bets');
+    const r = localStorage.getItem('sb95_rules');
+    const cu = localStorage.getItem('sb95_currentUser');
+
+    if (u) try { users = JSON.parse(u); } catch(e){}
+    if (b) try { bets = JSON.parse(b); } catch(e){}
+    if (r) gameRules = r;
+    if (cu) currentUser = users.find(x => x.name === cu) || null;
+}
+
+window.onload = init;
+</script>
+</body>
+</html>
